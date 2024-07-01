@@ -32,16 +32,19 @@ import * as ReactDOM from 'react-dom/client';
 import VisualConstructorOptions = powerbi.extensibility.visual.VisualConstructorOptions;
 import VisualUpdateOptions = powerbi.extensibility.visual.VisualUpdateOptions;
 import IVisual = powerbi.extensibility.visual.IVisual;
+import ISelection = powerbi.extensibility.ISelectionManager;
 import VisualService from './services/VisualService';
 import VisualBroker from "./components/VisualBroker";
 
 
 export class Visual implements IVisual {
     private target: HTMLElement;
+    static selectionManager: ISelection;
 
-   constructor(options: VisualConstructorOptions |any) {
-        VisualService.visualHost = options.host
-        this.target = options.element;
+   constructor(options: VisualConstructorOptions) {
+      VisualService.visualHost = options.host
+      this.target = options.element;
+      Visual.selectionManager = options.host.createSelectionManager();
     }
 
     public update(options: VisualUpdateOptions) {

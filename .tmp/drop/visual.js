@@ -64,7 +64,7 @@ const scalingOptions = [
     }
 ];
 const Scaling = (props) => {
-    const selectedScaling = props.dataViews?.metadata?.objects.general.scaling;
+    const selectedScaling = props.dataViews?.metadata?.objects?.general.scaling;
     const currentValue = selectedScaling ?? scalingOptions[0]?.value;
     const onScalingChange = (value) => {
         _services_VisualService__WEBPACK_IMPORTED_MODULE_2__/* ["default"] */ .A.setVisualPersistedProperties({
@@ -91,6 +91,8 @@ const Scaling = (props) => {
 /* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(540);
+/* harmony import */ var _services_VisualService__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(859);
+
 
 
 const getValueForNode = (rowNode, colNode, rowIndex) => {
@@ -130,7 +132,7 @@ const constructValues = (rowsRoot, columnsRoot) => {
 };
 const Table = (props) => {
     const { matrix } = props.dataViews;
-    const scaleValue = props.dataViews?.metadata?.objects.general.scaling;
+    const scaleValue = props.dataViews?.metadata?.objects?.general?.scaling;
     const rows = matrix.rows.root.children.map(row => row.value);
     const cols = matrix.columns.root.children.map(col => col.value);
     const values = constructValues(matrix.rows.root, matrix.columns.root);
@@ -143,6 +145,10 @@ const Table = (props) => {
     const scaleFactor = +scaleValue || 1;
     const scaledString = scaleFactor !== 1 ? ` ${scales[scaleValue]}` : '';
     const scaledValues = values.map(row => row.map(value => value !== null ? (value / scaleFactor).toFixed(2) + scaledString : null));
+    const onClick = (rowId) => {
+        const row = matrix.rows.root.children.find(row => row.value === rowId);
+        _services_VisualService__WEBPACK_IMPORTED_MODULE_1__/* ["default"] */ .A.updateSelection(row);
+    };
     return (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null,
         react__WEBPACK_IMPORTED_MODULE_0__.createElement("table", { className: "table" },
             react__WEBPACK_IMPORTED_MODULE_0__.createElement("thead", null,
@@ -150,7 +156,8 @@ const Table = (props) => {
                     react__WEBPACK_IMPORTED_MODULE_0__.createElement("th", null),
                     cols?.map((header, colIndex) => (react__WEBPACK_IMPORTED_MODULE_0__.createElement("th", { key: colIndex }, header))))),
             react__WEBPACK_IMPORTED_MODULE_0__.createElement("tbody", null, rows?.map((header, rowIndex) => (react__WEBPACK_IMPORTED_MODULE_0__.createElement("tr", { key: rowIndex },
-                react__WEBPACK_IMPORTED_MODULE_0__.createElement("td", null, header),
+                react__WEBPACK_IMPORTED_MODULE_0__.createElement("td", null,
+                    react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { onClick: () => onClick(header) }, header)),
                 scaledValues[rowIndex]?.map((value, colIndex) => (react__WEBPACK_IMPORTED_MODULE_0__.createElement("td", { key: colIndex }, value !== null ? value.toString() : '-'))))))))));
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Table);
@@ -181,7 +188,7 @@ const themeOptions = [
     }
 ];
 const ThemeComponent = (props) => {
-    const selectedTheme = props.dataViews.metadata.objects.general.theme;
+    const selectedTheme = props.dataViews.metadata?.objects?.general?.theme;
     const currentValue = selectedTheme ?? themeOptions[0]?.value;
     const onThemeChange = (value) => {
         _services_VisualService__WEBPACK_IMPORTED_MODULE_2__/* ["default"] */ .A.setVisualPersistedProperties({
@@ -226,7 +233,7 @@ const ThemeComponent = (props) => {
 
 const VisualBroker = (props) => {
     const dataViews = props.dataViews[0];
-    const backgroundColor = dataViews.metadata.objects.general.theme === _Constants_UIConstants__WEBPACK_IMPORTED_MODULE_4__/* .THEME */ .CV.DARK ? '#585858' : '#ffffff';
+    const backgroundColor = dataViews?.metadata?.objects?.general?.theme === _Constants_UIConstants__WEBPACK_IMPORTED_MODULE_4__/* .THEME */ .CV.DARK ? '#585858' : '#ffffff';
     const backgroundStyle = {
         background: backgroundColor
     };
@@ -249,10 +256,11 @@ const VisualBroker = (props) => {
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+/* harmony import */ var _visual__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(375);
+
 class VisualService {
     static visualOptions;
     static visualHost;
-    static dataView;
     static setVisualPersistedProperties(props) {
         const { propertyType, updateKind, value } = props;
         this.visualHost.persistProperties({
@@ -266,6 +274,13 @@ class VisualService {
                 }
             ]
         });
+    }
+    static updateSelection(row) {
+        const selectionId = this.visualHost
+            .createSelectionIdBuilder()
+            .withMatrixNode(row, this.visualOptions.dataViews[0].matrix.rows.levels)
+            .createSelectionId();
+        _visual__WEBPACK_IMPORTED_MODULE_0__/* .Visual */ .b.selectionManager.select(selectionId);
     }
 }
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (VisualService);
@@ -281,8 +296,8 @@ class VisualService {
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(540);
 /* harmony import */ var react_dom_client__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(338);
-/* harmony import */ var _services_VisualService__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(859);
-/* harmony import */ var _components_VisualBroker__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(801);
+/* harmony import */ var _services_VisualService__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(859);
+/* harmony import */ var _components_VisualBroker__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(801);
 /*
 *  Power BI Visual CLI
 *
@@ -316,13 +331,15 @@ class VisualService {
 
 class Visual {
     target;
+    static selectionManager;
     constructor(options) {
-        _services_VisualService__WEBPACK_IMPORTED_MODULE_3__/* ["default"] */ .A.visualHost = options.host;
+        _services_VisualService__WEBPACK_IMPORTED_MODULE_2__/* ["default"] */ .A.visualHost = options.host;
         this.target = options.element;
+        Visual.selectionManager = options.host.createSelectionManager();
     }
     update(options) {
-        _services_VisualService__WEBPACK_IMPORTED_MODULE_3__/* ["default"] */ .A.visualOptions = options;
-        const rootElement = react__WEBPACK_IMPORTED_MODULE_0__.createElement(_components_VisualBroker__WEBPACK_IMPORTED_MODULE_2__/* ["default"] */ .A, options);
+        _services_VisualService__WEBPACK_IMPORTED_MODULE_2__/* ["default"] */ .A.visualOptions = options;
+        const rootElement = react__WEBPACK_IMPORTED_MODULE_0__.createElement(_components_VisualBroker__WEBPACK_IMPORTED_MODULE_3__/* ["default"] */ .A, options);
         const root = react_dom_client__WEBPACK_IMPORTED_MODULE_1__/* .createRoot */ .H(this.target);
         root.render(rootElement);
     }

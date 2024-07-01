@@ -14,7 +14,7 @@ const themeOptions = [
 ]
 
 const ThemeComponent = (props) => {
-    const selectedTheme = props.dataViews.metadata.objects.general.theme
+    const selectedTheme = props.dataViews.metadata?.objects?.general?.theme
     const currentValue = selectedTheme ?? themeOptions[0]?.value;
     const onThemeChange = (value:string) => {
         VisualService.setVisualPersistedProperties({

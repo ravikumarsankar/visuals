@@ -28,7 +28,7 @@ const scalingOptions = [
     }
 ]
 const Scaling = (props) => {
-    const selectedScaling = props.dataViews?.metadata?.objects.general.scaling;
+    const selectedScaling = props.dataViews?.metadata?.objects?.general.scaling;
     const currentValue = selectedScaling ?? scalingOptions[0]?.value;
     const onScalingChange = (value:string) => {
         VisualService.setVisualPersistedProperties({

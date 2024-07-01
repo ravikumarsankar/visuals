@@ -1,4 +1,5 @@
 import * as React from 'react';
+import VisualService from '../services/VisualService';
 import '../styles/table.less'
 
 
@@ -46,7 +47,7 @@ const getValueForNode = (rowNode, colNode,rowIndex): number | null => {
 
 const Table = (props) => {
     const { matrix } = props.dataViews;
-    const scaleValue = props.dataViews?.metadata?.objects.general.scaling;
+    const scaleValue = props.dataViews?.metadata?.objects?.general?.scaling;
     const rows = matrix.rows.root.children.map(row => row.value) as string[];
     const cols = matrix.columns.root.children.map(col => col.value) as string[];
     const values = constructValues(matrix.rows.root,matrix.columns.root);
@@ -63,6 +64,10 @@ const Table = (props) => {
                value !== null ? (value / scaleFactor).toFixed(2) + scaledString : null
         )
     );
+    const onClick = (rowId:string) => {
+       const row = matrix.rows.root.children.find(row =>row.value===rowId )
+       VisualService.updateSelection(row)
+    }
  
 return (
     <div>
@@ -75,10 +80,11 @@ return (
             ))}
           </tr>
         </thead>
-        <tbody>
+            <tbody>
+                
           {rows?.map((header, rowIndex) => (
             <tr key={rowIndex}>
-              <td>{header}</td>
+              <td><div onClick={()=>onClick(header)}>{header}</div></td>
                {scaledValues[rowIndex]?.map((value, colIndex) => (
                 <td key={colIndex}>{value !== null ? value.toString() : '-'}</td>
               ))}
