@@ -96,15 +96,11 @@ const Scaling = (props) => {
 
 
 const getValueForNode = (rowNode, colNode, rowIndex) => {
-    // Navigate through values if they exist
     let value = null;
-    // Find the value based on the row and column keys
     if (rowNode.values) {
         value = rowNode.values[rowIndex].value;
     }
-    // If no direct value, check for children
     if (!value && rowNode.children && colNode.children) {
-        // Traverse deeper into row and column children
         for (let rChild of rowNode.children) {
             for (let cChild of colNode.children) {
                 value = getValueForNode(rChild, cChild, rowIndex);
@@ -121,7 +117,6 @@ const constructValues = (rowsRoot, columnsRoot) => {
     const rows = rowsRoot.children;
     const cols = columnsRoot.children;
     const values = Array.from({ length: rows.length }, () => Array(cols.length).fill(null));
-    // Populate values array
     rows.forEach((rowNode, rowIndex) => {
         cols.forEach((colNode, colIndex) => {
             const value = rowNode.values[colIndex].value;

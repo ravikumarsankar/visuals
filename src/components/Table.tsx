@@ -3,18 +3,12 @@ import VisualService from '../services/VisualService';
 import '../styles/table.less'
 
 
-const getValueForNode = (rowNode, colNode,rowIndex): number | null => {
-    // Navigate through values if they exist
-    let value: number | null = null;
-
-    // Find the value based on the row and column keys
-    if (rowNode.values) {
+const getValueForNode = (rowNode, colNode,rowIndex): number => {
+    let value: number  = null;
+  if (rowNode.values) {
       value = rowNode.values[rowIndex].value as number | null;
     }
-
-    // If no direct value, check for children
-    if (!value && rowNode.children && colNode.children) {
-      // Traverse deeper into row and column children
+   if (!value && rowNode.children && colNode.children) {
       for (let rChild of rowNode.children) {
         for (let cChild of colNode.children) {
           value = getValueForNode(rChild, cChild,rowIndex);
@@ -29,12 +23,8 @@ const getValueForNode = (rowNode, colNode,rowIndex): number | null => {
   const constructValues = (rowsRoot, columnsRoot) => {
       const rows = rowsRoot.children;
       const cols = columnsRoot.children;
-
-
-   const values = Array.from({ length: rows.length }, () => Array(cols.length).fill(null));
-
-    // Populate values array
-    rows.forEach((rowNode, rowIndex) => {
+      const values = Array.from({ length: rows.length }, () => Array(cols.length).fill(null));
+      rows.forEach((rowNode, rowIndex) => {
       cols.forEach((colNode, colIndex) => {
         const value = rowNode.values[colIndex].value;
         values[rowIndex][colIndex] = value;
